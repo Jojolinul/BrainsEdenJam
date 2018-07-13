@@ -1,32 +1,20 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+Binaries
+DerivedDataCache
+Intermediate
+Saved
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+*.ipch
+Build/WindowsNoEditor/FileOpenOrder/EditorOpenOrder.log
+Build/WindowsNoEditor/FileOpenOrder/CookerOpenOrder.log
+.vs/RoboHood/v15/Solution.VC.db-wal
+.vs/RoboHood/v15/Solution.VC.db-shm
+Content/StarterContent/Architecture/Floor_400x400.uasset
+Content/StarterContent/Architecture/Floor_400x400.uasset
+Content/StarterContent/Architecture/Floor_400x400.uasset
