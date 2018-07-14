@@ -7,12 +7,16 @@
 
 #include "Blueprint/UserWidget.h"
 #include "W_Pickup.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "A_Pickup.h"
 
 // Sets default values
 AC_Character::AC_Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	Grabber = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Grabby"));
 }
 
 // Called when the game starts or when spawned
@@ -64,6 +68,7 @@ void AC_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	check(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("Pickup", IE_Pressed, this, &AC_Character::PickUp);
 	PlayerInputComponent->BindAxis("Joystick-Up/Down", this, &AC_Character::VerticalMove);
 	PlayerInputComponent->BindAxis("Joystick-Left/Right", this, &AC_Character::HorizontalMove);
 	PlayerInputComponent->BindAxis("Heal", this, &AC_Character::HealRobot);
@@ -162,39 +167,11 @@ void AC_Character::CheckFront()
 
 	FQuat SphereCheckRotator = FQuat();
 
-	//TArray<FHitResult> TraceResult;
 	FHitResult TraceResult(ForceInit);
-	//GetWorld()->SweepSingleByChannel(TraceResult, Start, End, SphereCheckRotator, SphereCollisionChannel, SphereCheckShape, SphereTraceQueryParameters, SphereTraceResponseParameters);
-
-	//GetWorld()->SweepMultiByChannel(TraceResult, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100), SphereCheckRotator, SphereCollisionChannel, SphereCheckShape, SphereTraceQueryParameters, SphereTraceResponseParameters);
 	GetWorld()->SweepSingleByChannel(TraceResult, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100), SphereCheckRotator, SphereCollisionChannel, SphereCheckShape, SphereTraceQueryParameters, SphereTraceResponseParameters);
 
-	//for (size_t i = 0; i < TraceResult.Num(); i++)
-	//{
-	//	if (TraceResult[i].bBlockingHit && TraceResult[i].GetActor() != this)
-	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("ADSADAS"));
-	//		UKismetSystemLibrary::DrawDebugSphere(GetWorld(), TraceResult[i].Location, 15.0f, 12, FColor(255, 255, 0), 0, 1);
 
-	//		if (PickUpWidget && WidgetRef == nullptr)
-	//		{
-	//			WidgetRef = CreateWidget<UUserWidget>(Cast<APlayerController>(Controller), PickUpWidget);
-	//			if (WidgetRef)
-	//			{
-	//				WidgetRef->AddToViewport();
-	//				Cast<UW_Pickup>(WidgetRef)->IniButton(TraceResult[i].GetActor()->GetActorLocation());
-	//			}
-	//		}
-	//	}
-	//	else if (WidgetRef != nullptr && TraceResult.Num() < 1)
-	//	{
-	//		WidgetRef->RemoveFromViewport();
-	//		WidgetRef->RemoveFromParent();
-	//		WidgetRef = nullptr;
-	//	}
-	//}
-
-	if (TraceResult.bBlockingHit)
+	if (TraceResult.bBlockingHit && !CurrentItem)
 	{
 		if (TraceResult.Actor != this)
 		{
@@ -206,7 +183,7 @@ void AC_Character::CheckFront()
 				if (WidgetRef)
 				{
 					WidgetRef->AddToViewport();
-					Cast<UW_Pickup>(WidgetRef)->IniButton(TraceResult.GetActor()->GetActorLocation());
+					Cast<UW_Pickup>(WidgetRef)->IniButton(TraceResult.GetActor());
 				}
 			}
 		}
@@ -219,5 +196,45 @@ void AC_Character::CheckFront()
 	}
 
 	UKismetSystemLibrary::DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100), FColor(255, 0, 0), 0, 4);
+}
+
+void AC_Character::PickUp()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("PICKUP"));
+
+	SphereTraceQueryParameters.bTraceAsyncScene = false;
+	SphereTraceQueryParameters.bTraceComplex = false;
+	SphereTraceQueryParameters.bReturnFaceIndex = false;
+	SphereTraceQueryParameters.AddIgnoredActor(this);
+
+	SphereCheckShape = FCollisionShape::MakeSphere(15.0f);
+	SphereCollisionChannel = ECC_WorldStatic;
+
+	FQuat SphereCheckRotator = FQuat();
+
+	FHitResult TraceResult(ForceInit);
+
+	GetWorld()->SweepSingleByChannel(TraceResult, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 100), SphereCheckRotator, SphereCollisionChannel, SphereCheckShape, SphereTraceQueryParameters, SphereTraceResponseParameters);
+
+	if (TraceResult.bBlockingHit && !CurrentItem)
+	{
+		const AActor* _OtherActor = Cast<AA_Pickup>(TraceResult.GetActor());
+		if (_OtherActor)
+		{
+			CurrentItem = TraceResult.GetActor();
+			CurrentItem->SetActorLocationAndRotation(GetMesh()->GetSocketTransform("Arms").GetLocation(), GetMesh()->GetSocketTransform("Arms").GetRotation());
+			Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(false);
+			TraceResult.GetActor()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform, "Arms");
+		}
+		
+	}
+	else if (CurrentItem)
+	{
+		CurrentItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(true);
+		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetPhysicsLinearVelocity(FVector::ZeroVector, false);
+		CurrentItem = nullptr;
+	}
 }
 

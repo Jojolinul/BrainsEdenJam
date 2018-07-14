@@ -14,7 +14,7 @@ class MYPROJECT_API UW_Pickup : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void IniButton(FVector Location);
+	void IniButton(AActor* Location);
 	
 	
 };

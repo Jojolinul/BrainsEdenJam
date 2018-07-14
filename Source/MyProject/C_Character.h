@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Engine.h"
 #include "GameFramework/Character.h"
 #include "C_Character.generated.h"
 
@@ -32,6 +32,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool isStunned;
+
+	UPROPERTY(EditDefaultsOnly)
+	UPhysicsHandleComponent* Grabber;
 
 public:	
 
@@ -72,8 +75,14 @@ private:
 
 	void CheckFront();
 
+	void PickUp();
+
 	FCollisionQueryParams SphereTraceQueryParameters;
 	FCollisionResponseParams SphereTraceResponseParameters;
 	FCollisionShape SphereCheckShape;
 	ECollisionChannel SphereCollisionChannel;
+
+	AActor* CurrentItem;
+
+	bool Holding;
 };
