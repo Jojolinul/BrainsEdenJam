@@ -112,6 +112,7 @@ void AA_PickupManager::SpawnRocketComponents(int componentIndex, int componentSi
 FVector AA_PickupManager::SpawnLocation(int componentSide)
 {
 	FVector spawnLocation;
+	spawnLocation.Z = 100.0f;
 	if (componentSide == SIDECOMPONENT::LEFT)
 	{
 		spawnLocation.X = FMath::RandRange(leftSpawnPosition.X - leftSpawnRange.X, leftSpawnPosition.X + leftSpawnRange.X);
