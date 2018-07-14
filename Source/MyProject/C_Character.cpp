@@ -9,6 +9,8 @@
 #include "W_Pickup.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "A_Pickup.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "A_Tower.h"
 
 // Sets default values
 AC_Character::AC_Character()
@@ -23,6 +25,8 @@ AC_Character::AC_Character()
 void AC_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 
 	isMoving = false;
 	isStunned = false;
@@ -79,11 +83,11 @@ void AC_Character::VerticalMove(float Value)
 	if (!isStunned)
 	{
 
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		//const FRotator Rotation = Controller->GetControlRotation();
+		//const FRotator YawRotation(0, Rotation.Yaw, 0);
+		//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		AddMovementInput(Direction, Value);
+		AddMovementInput(FVector(0, 1, 0), Value);
 
 		SetRotation();
 	}
@@ -96,11 +100,11 @@ void AC_Character::HorizontalMove(float Value)
 	if (!isStunned)
 	{
 
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		//const FRotator Rotation = Controller->GetControlRotation();
+		//const FRotator YawRotation(0, Rotation.Yaw, 0);
+		//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		AddMovementInput(-Direction, Value);
+		AddMovementInput(FVector(-1, 0, 0), Value);
 	}
 
 	if (Value != 0) SetRotation();
@@ -135,9 +139,6 @@ void AC_Character::CheckMovement()
 {
 	if (GetVelocity().Size() > 1.0f) isMoving = true;
 	else isMoving = false;
-
-	//if (Durability < MidDurability) CharacterMovement->MaxWalkSpeed = 100.f;
-	//else CharacterMovement()->MaxWalkSpeed = 150.f;
 }
 
 void AC_Character::SetRotation()
@@ -150,7 +151,7 @@ void AC_Character::SetRotation()
 
 		FMath::RInterpTo(GetActorRotation(), LookAtRot, GetWorld()->DeltaTimeSeconds, 1.0f);
 
-		SetActorRotation(FMath::RInterpTo(GetActorRotation(), LookAtRot, GetWorld()->DeltaTimeSeconds, 20.0f));
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), LookAtRot, GetWorld()->DeltaTimeSeconds, 12.5f));
 
 	}
 }
@@ -227,7 +228,12 @@ void AC_Character::PickUp()
 			Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(false);
 			TraceResult.GetActor()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform, "Arms");
 		}
-		
+
+		_OtherActor = Cast<AA_Tower>(TraceResult.GetActor());
+		if (_OtherActor)
+		{
+			Cast<AA_Tower>(TraceResult.GetActor())->DamageTower();
+		}
 	}
 	else if (CurrentItem)
 	{
@@ -236,5 +242,10 @@ void AC_Character::PickUp()
 		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetPhysicsLinearVelocity(FVector::ZeroVector, false);
 		CurrentItem = nullptr;
 	}
+}
+
+void AC_Character::IncreaseSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed += SpeedIncrease;
 }
 

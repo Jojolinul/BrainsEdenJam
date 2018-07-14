@@ -51,6 +51,8 @@ public:
 	void ApplyStun();
 	void RemoveStun();
 
+	void IncreaseSpeed();
+
 	FTimerHandle Stun_Timehandle;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -64,6 +66,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> PickUpWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BaseMovementSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
+	float SpeedIncrease;
 
 	class UUserWidget* WidgetRef;
 
