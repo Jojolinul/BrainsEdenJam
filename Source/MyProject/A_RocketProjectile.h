@@ -25,14 +25,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/** Projectile movement component */
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UProjectileMovementComponent* ProjectileMovement;
-
 	/** Sphere Component */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComponent;
 	
-	void SetHoming();
-	bool isHoming = false;
+	void GoUp(FVector newLocation);
+	void GoDown(FVector newLocation);
+	void SetGoingDown();
+
+	float zPosition = 0.0f;
+	FVector endLocation;
+	bool isGoingUp = true;
+
 };
