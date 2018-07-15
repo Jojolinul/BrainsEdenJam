@@ -69,8 +69,4 @@ public:
 
 	AC_Character* PlayerRef;
 
-
-
-	
-	
 };

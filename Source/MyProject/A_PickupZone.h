@@ -34,6 +34,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AA_RocketProjectile> RocketBP;
 
+	UPROPERTY(EditAnywhere)
 	FVector rocketLocation;
 
 protected:
