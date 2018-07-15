@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "A_Tower.h"
 #include "A_RocketProjectile.generated.h"
 
 UCLASS()
@@ -32,8 +33,12 @@ public:
 	void GoUp(FVector newLocation);
 	void GoDown(FVector newLocation);
 	void SetGoingDown();
+	void TowerCollision();
 
 	float zPosition = 0.0f;
+	int index = INFINITY;
+	TArray<AA_Tower*> towerArray;
+
 	FVector endLocation;
 	bool isGoingUp = true;
 
