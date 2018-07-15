@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "A_RocketProjectile.h"
-#include "C_Character.h"
+#include "A_Tower.h"
 #include "Public/EngineUtils.h"
 
 
@@ -22,17 +22,15 @@ void AA_RocketProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<AC_Character*> playerArray;
-	for (TActorIterator<AC_Character> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	for (TActorIterator<AA_Tower> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-		if (ActorItr)	playerArray.Push(*ActorItr);
+		if (ActorItr)	towerArray.Push(*ActorItr);
 	}
 
 	float closestPlayer = 0.0f;
-	int index = INFINITY;
-	for (int x = 0; x < playerArray.Num(); x++)
+	for (int x = 0; x < towerArray.Num(); x++)
 	{
-		float temp = FVector::Distance(playerArray[x]->GetActorLocation(), GetActorLocation());
+		float temp = FVector::Distance(towerArray[x]->GetActorLocation(), GetActorLocation());
 		if (temp > closestPlayer)
 		{
 			index = x;
@@ -42,7 +40,7 @@ void AA_RocketProjectile::BeginPlay()
 
 	FTimerHandle timerHandle;
 	GetWorldTimerManager().SetTimer(timerHandle, this, &AA_RocketProjectile::SetGoingDown, 1.0f, false, 2.0f);
-	endLocation = playerArray[index]->GetActorLocation();
+	endLocation = towerArray[index]->GetActorLocation();
 }
 
 void AA_RocketProjectile::GoUp(FVector newLocation)
@@ -62,18 +60,20 @@ void AA_RocketProjectile::Tick(float DeltaTime)
 
 	if (isGoingUp)
 	{
-		zPosition += DeltaTime * 1000.0f;
+		zPosition += DeltaTime * 600.0f;
 		FVector newLocation = FVector(GetActorLocation().X, GetActorLocation().Y, zPosition);
 		GoUp(newLocation);
 	}
 	else 
 	{ 
-		zPosition -= DeltaTime * 1000.0f;
+		zPosition -= DeltaTime * 600.0f;
 		SetActorRotation(FRotator(-180.0f, 0.0f, 0.0f));
 		FVector newLocation = FVector(GetActorLocation().X, GetActorLocation().Y, zPosition);
 		GoDown(newLocation);
+		TowerCollision();
 	}
 }
+
 
 void AA_RocketProjectile::SetGoingDown()
 {
@@ -83,5 +83,18 @@ void AA_RocketProjectile::SetGoingDown()
 	SetActorLocation(FVector(tempX, tempY, GetActorLocation().Z));
 
 	isGoingUp = false;
+}
+
+void AA_RocketProjectile::TowerCollision()
+{
+	float distanceToTower = FVector::Distance(endLocation, GetActorLocation());
+	if (distanceToTower < 25.0f)
+	{
+		if (towerArray[index])
+		{
+			towerArray[index]->DamageTower();
+			Destroy();
+		}
+	}
 }
 
