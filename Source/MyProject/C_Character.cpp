@@ -225,6 +225,8 @@ void AC_Character::PickUp()
 		const AActor* _OtherActor = Cast<AA_Pickup>(TraceResult.GetActor());
 		if (_OtherActor)
 		{
+			if (!CurrentItem) Durability -= 10.0f;
+
 			CurrentItem = TraceResult.GetActor();
 			CurrentItem->SetActorLocationAndRotation(GetMesh()->GetSocketTransform("Arms").GetLocation(), GetMesh()->GetSocketTransform("Arms").GetRotation());
 			Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(false);
