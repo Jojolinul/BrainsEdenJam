@@ -55,6 +55,8 @@ public:
 
 	FTimerHandle Stun_Timehandle;
 
+	FTimerHandle Drop_Timehandle;
+
 	UPROPERTY(EditDefaultsOnly)
 	float DecayRate;
 
@@ -93,4 +95,10 @@ private:
 	AActor* CurrentItem;
 
 	bool Holding;
+
+	void ForceDropItem();
+
+	void Unreliable();
+
+
 };

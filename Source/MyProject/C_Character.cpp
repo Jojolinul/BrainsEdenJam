@@ -36,6 +36,8 @@ void AC_Character::BeginPlay()
 	MinDurability = 0;
 
 	Durability = 100;
+
+	GetWorldTimerManager().SetTimer(Drop_Timehandle, this, &AC_Character::Unreliable, 2.0f, true);
 }
 
 // Called every frame
@@ -236,6 +238,29 @@ void AC_Character::PickUp()
 		}
 	}
 	else if (CurrentItem)
+	{
+		CurrentItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(true);
+		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetPhysicsLinearVelocity(FVector::ZeroVector, false);
+		CurrentItem = nullptr;
+	}
+}
+
+void AC_Character::Unreliable()
+{
+
+	if (Durability < 85)
+	{
+		if (FMath::RandRange(0, 1) == 0)
+		{
+			ForceDropItem();
+		}
+	}
+}
+
+void AC_Character::ForceDropItem()
+{
+	if (CurrentItem)
 	{
 		CurrentItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Cast<UPrimitiveComponent>(CurrentItem->GetRootComponent())->SetSimulatePhysics(true);
