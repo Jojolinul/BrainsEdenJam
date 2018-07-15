@@ -35,4 +35,9 @@ public:
 	int sideIndex;
 
 	void Initialise(int componentIndex, int componentSide);
+
+	bool disablePhysics;
+
+	UPROPERTY(EditAnywhere)
+		float FreezeZ;
 };

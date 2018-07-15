@@ -13,6 +13,9 @@ AA_Pickup::AA_Pickup()
 	//Setting up the Collision Sphere Component
 	CollisionSphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	RootComponent = CollisionSphereComponent;
+
+	disablePhysics = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +29,18 @@ void AA_Pickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	if (!disablePhysics)
+	{
+		if (GetActorLocation().Z <= FreezeZ)
+		{
+			UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(GetRootComponent());
+			if (Prim)
+			{
+				Prim->SetSimulatePhysics(false);
+			}
+		}
+	}
 }
 
 void AA_Pickup::Initialise(int cI, int sI)

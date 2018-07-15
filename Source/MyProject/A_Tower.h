@@ -31,9 +31,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UDestructibleComponent* StageThree;
 
-	UPROPERTY(VisibleDefaultsOnly)
-	USceneComponent* _SpawnLocation;
-
 	int32 TowerStage;
 
 	void DamageTower();
@@ -62,9 +59,13 @@ public:
 	int32 TowerIndex;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AC_Character> PlayerBP;
+		FVector SpawnVetor;
 
-private:
+	UPROPERTY(EditAnywhere)
+		FRotator SpawnRotator;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AC_Character> PlayerBP;
 
 	AC_Character* PlayerRef;
 

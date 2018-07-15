@@ -4,6 +4,7 @@
 
 #include "C_Character.h"
 #include "DestructibleComponent.h"
+#include "G_GameMode.h"
 
 // Sets default values
 AA_Tower::AA_Tower()
@@ -25,9 +26,6 @@ AA_Tower::AA_Tower()
 
 	StageThree = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Tower Top"));
 	StageThree->SetupAttachment(RootComponent);
-
-	_SpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn"));
-	_SpawnLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -56,7 +54,7 @@ APawn* AA_Tower::SpawnPlayer()
 
 	if (PlayerBP != NULL)
 	{
-		PlayerRef = GetWorld()->SpawnActor<AC_Character>(PlayerBP, _SpawnLocation->GetComponentToWorld().GetLocation(), _SpawnLocation->GetComponentToWorld().Rotator(), SpawnParams);
+		PlayerRef = GetWorld()->SpawnActor<AC_Character>(PlayerBP, SpawnVetor, SpawnRotator, SpawnParams);
 	}
 
 	return PlayerRef;
@@ -73,6 +71,12 @@ void AA_Tower::DamageTower()
 	PlayerRef->IncreaseSpeed();
 
 	GetWorldTimerManager().SetTimer(Hide_Timehandle, this, &AA_Tower::RemoveDeb, 3.0f);
+
+	AG_GameMode* _GameMode = Cast<AG_GameMode>(GetWorld()->GetAuthGameMode());
+	if (_GameMode)
+	{
+		_GameMode->CheckForWinState();
+	}
 }
 
 void AA_Tower::RemoveDeb()

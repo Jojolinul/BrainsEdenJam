@@ -47,7 +47,7 @@ void AC_Character::Tick(float DeltaTime)
 
 	if (isMoving)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability); 
+		//UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability); 
 		Durability -= GetWorld()->DeltaTimeSeconds * DecayRate;
 	}
 
@@ -55,7 +55,7 @@ void AC_Character::Tick(float DeltaTime)
 
 	if (isStunned)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability);
+		//UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability);
 		Durability += GetWorld()->DeltaTimeSeconds * ForceRepairRate;
 	}
 
@@ -114,7 +114,7 @@ void AC_Character::HealRobot(float Value)
 {
 	if (!isMoving && Value != 0 && Durability <= MaxDurability && !isStunned)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability);
+		//UE_LOG(LogTemp, Warning, TEXT("Durability: %f"), Durability);
 		Durability += GetWorld()->DeltaTimeSeconds * HealRate;
 	}
 }
